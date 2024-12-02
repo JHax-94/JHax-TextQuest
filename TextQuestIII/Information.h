@@ -1,0 +1,6 @@
+#ifndef INFORMATION_H_INCLUDED
+#define INFORMATION_H_INCLUDED
+
+void Menu();
+
+#endif // INFORMATION_H_INCLUDED

@@ -1,0 +1,200 @@
+# depslib dependency file v1.0
+1365786550 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\buildings.cpp
+	"buildings.h"
+
+1365872078 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\buildings.h
+	<iostream>
+	<string>
+	<cstdlib>
+	"characters.h"
+
+1373457031 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\characters.h
+	<string>
+	<math.h>
+	"spells.h"
+	"quests.h"
+	"items.h"
+
+1367357874 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\quests.h
+	<string>
+
+1373551471 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\items.h
+	<cstdlib>
+	<iostream>
+	<sstream>
+	<fstream>
+
+1359119738 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\characterclass.cpp
+
+1372858039 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\charactercreation.cpp
+	<string>
+	<cstdlib>
+	<iostream>
+	"Screens.h"
+	"Inputs.h"
+	"Save.h"
+	"characters.h"
+	"towns.h"
+
+1372951766 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\screens.h
+	"characters.h"
+	"arenas.h"
+
+1373044870 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\inputs.h
+	"arenas.h"
+	"characters.h"
+
+1365958864 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\save.h
+
+1365786763 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\towns.h
+	<iostream>
+	<cstdlib>
+	"buildings.h"
+
+1373457031 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\characters.cpp
+	<cstdlib>
+	<cstdio>
+	<iostream>
+	<fstream>
+	<sstream>
+	<iostream>
+	<cstdlib>
+	"characters.h"
+	"Inputs.h"
+
+1373552409 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\combat.cpp
+	"DiceBoard.h"
+	"Inputs.h"
+	"Combat.h"
+	"Screens.h"
+
+1366834968 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\dialogue.cpp
+	<cstdlib>
+	<sstream>
+	"Screens.h"
+	"Dialogue.h"
+	"Inputs.h"
+
+1365777409 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\dialogue.h
+	"maps.h"
+
+1362593673 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\maps.h
+	<string>
+	"towns.h"
+
+1373452288 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\diceboard.cpp
+	<cstdlib>
+
+1360622570 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\information.cpp
+	<cstdlib>
+	<cstdio>
+	<string>
+	<iostream>
+	"Screens.h"
+	"maps.h"
+
+1373458206 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\inputs.cpp
+	<iostream>
+	<cstdlib>
+	<cstdio>
+	<string>
+	<sstream>
+	"string.h"
+	"Screens.h"
+
+1373551521 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\items.cpp
+	<sstream>
+	"items.h"
+
+1372940275 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\levelcontrol.cpp
+	<iostream>
+	<cstdio>
+	<cstdlib>
+	"Screens.h"
+	"maps.h"
+	"Inputs.h"
+	"Dialogue.h"
+
+1372698796 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\main.cpp
+	<iostream>
+	<string>
+	<sstream>
+	<cstdlib>
+	<time.h>
+	"Inputs.h"
+	"Screens.h"
+	"CharacterCreation.h"
+	"Save.h"
+	"Information.h"
+	"characters.h"
+	"maps.h"
+	"LevelControl.h"
+	"quests.h"
+	"items.h"
+	"Combat.h"
+
+1360339238 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\charactercreation.h
+	"characters.h"
+
+1359564597 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\information.h
+
+1365959134 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\levelcontrol.h
+	"characters.h"
+
+1372858186 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\maps.cpp
+	<cstdlib>
+	<cstdio>
+	<iostream>
+	<string>
+	"Screens.h"
+	"maps.h"
+
+1367358066 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\quests.cpp
+	"quests.h"
+
+1366046752 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\save.cpp
+	<fstream>
+	<string>
+
+1373459015 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\screens.cpp
+	<string>
+	<cstdio>
+	<cstdlib>
+	<iostream>
+	<sstream>
+	<math.h>
+	"screens.h"
+	"Inputs.h"
+	"maps.h"
+
+1360614883 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\towns.cpp
+	<string>
+	"towns.h"
+
+1373550668 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\arenas.cpp
+	"arenas.h"
+
+1373550627 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\arenas.h
+	"objects.h"
+
+1372697213 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\objects.h
+	<string>
+
+1373457174 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\combat.h
+	"characters.h"
+	"arenas.h"
+	"objects.h"
+
+1372697307 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\objects.cpp
+	"objects.h"
+
+1372948223 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\spells.h
+	<iostream>
+	<string>
+
+1372948263 source:c:\users\josh\documents\c++\textquest iii\textquestiiiv092\spells.cpp
+	<sstream>
+	"spells.h"
+
+1359393282 c:\users\josh\documents\c++\textquest iii\textquestiiiv092\diceboard.h
+
