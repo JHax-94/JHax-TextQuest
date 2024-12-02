@@ -3,8 +3,17 @@
 #include <sstream>
 #include <cstdlib>
 #include <cstdio>
+#include <stdio.h>
+#include <termios.h>        //termios, TCSANOW, ECHO, ICANON
+#include <unistd.h>     //STDIN_FILENO
 
 using namespace std;
+
+
+    string LINUX_CLEAR = "clear";
+    string WINDOWS_CLEAR = "cls";
+
+    const char* CLEAR_COMMAND;
 
     int loop = 1;
 
@@ -90,7 +99,7 @@ using namespace std;
 
     int skelG = 1;
 
-    int begin;
+    int beginGame;
     int level;
 
     int item = 0;
@@ -118,6 +127,19 @@ using namespace std;
     string take;
 
     string blackgate;
+    
+void clearScreen() {
+    
+    #if defined _WIN32
+        system("cls");
+    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)        
+        std::cout<< u8"\033[2J\033[1;1H"; //Using ANSI Escape Sequences 
+    #elif defined (__APPLE__)
+        system("clear");
+    #endif
+}
+    
+    
 void drawinventory(){
 
     string pointstick;
@@ -864,12 +886,81 @@ void drawmap(){
 
 
 }
+
+void initialise() {
+    
+    #if defined _WIN32
+        CLEAR_COMMAND = WINDOWS_CLEAR.c_str();
+    #elif defined (__LINUX__) || defined(__gnu_linux__) || defined(__linux__)
+        CLEAR_COMMAND = LINUX_CLEAR.c_str();
+    #elif defined (__APPLE__)
+        CLEAR_COMMAND = LINUX_CLEAR.c_str();
+    #endif
+    
+    system(CLEAR_COMMAND);
+}
+
+void clearInputBuffer() {
+    cin.clear();
+    cin.ignore();
+}
+
+
+void pressKey()
+{
+    /// Nabbed from stack overflow: https://stackoverflow.com/questions/1449324/how-to-simulate-press-any-key-to-continue
+    
+    //the struct termios stores all kinds of flags which can manipulate the I/O Interface
+    //I have an old one to save the old settings and a new 
+    static struct termios oldt, newt;
+    printf("Press any key to continue....\n");
+
+    //tcgetattr gets the parameters of the current terminal
+    //STDIN_FILENO will tell tcgetattr that it should write the settings
+    // of stdin to oldt
+    tcgetattr( STDIN_FILENO, &oldt);
+    //now the settings will be copied 
+    newt = oldt;
+
+    //two of the c_lflag will be turned off
+    //ECHO which is responsible for displaying the input of the user in the terminal
+    //ICANON is the essential one! Normally this takes care that one line at a time will be processed
+    //that means it will return if it sees a "\n" or an EOF or an EOL
+    newt.c_lflag &= ~(ICANON | ECHO );      
+
+    //Those new settings will be set to STDIN
+    //TCSANOW tells tcsetattr to change attributes immediately. 
+    tcsetattr( STDIN_FILENO, TCSANOW, &newt);
+
+    //now the char wil be requested
+    getchar();
+
+    //the old settings will be written back to STDIN
+    tcsetattr( STDIN_FILENO, TCSANOW, &oldt);
+
+}
+
+void waitForAnyKey()
+{
+    pressKey();
+}
+
+string textInput()
+{
+    string returnVal;
+    
+    getline(cin, returnVal);
+    
+    return returnVal;
+}
+
 int main(){
 
+    initialise();
+    
     bool gameOn = true;
     while (gameOn != false)
     {
-
 
     cout << "===============================================================================\n";
     cout << "============================TEXT QUEST=========================================\n";
@@ -879,11 +970,11 @@ int main(){
     cout << "Dare you enter? (Yes/No)\n\n";
 
     reinput:
-    cin >> enter;
-
+    enter = textInput();
+    
     if(enter == "Yes")
     {
-    begin = 1;
+        beginGame = 1;
     }
     else if(enter == "No")
     {
@@ -896,76 +987,85 @@ int main(){
     }
 
 
-        switch(begin){
+        switch(beginGame){
 
         case 1:
 
 
-            system("cls");
+            system(CLEAR_COMMAND);
             cout << "===============================================================================\n";
             cout << "============================TEXT QUEST=========================================\n";
             cout << "===============================================================================\n";
             cout << endl << "Please enter your character's name: ";
-
-            cin.sync();
-            getline(cin, name);
+            
+            name = textInput();
             cout << endl << "Please choose your character's gender: ";
-            cin >> gender;
+            gender = textInput();
+            
             cout << endl << "Please choose your character's race: " << endl;
             cout << endl << "Human";
             cout << endl << "Elf";
             cout << endl << "Orc";
             cout << endl << "Dwarf" << endl << endl;
-            cin >> race;
+            
+            race = textInput();
 
 
-            if(race == "Human"){
-
-            indef = "a";
-            adj = "human";
-
-            str = 6;
-            agi = 5;
-            intel = 4;
-            }
-
-            else if(race == "Elf"){
-
-            indef = "an";
-            adj = "elven";
-
-            str = 3;
-            agi = 6;
-            intel = 6;
-            }
-
-            else if(race == "Orc"){
-
-            indef = "an";
-            adj = "orcish";
-
-            str = 8;
-            agi = 4;
-            intel = 3;
-            }
-
-            else if(race == "Dwarf"){
-
-            indef = "a";
-            adj = "dwarven";
-
-            str = 6;
-            agi = 3;
-            intel = 6;
-            }
-
-            else
+            bool raceSelected = false;
+            do
             {
-                cout << "Enter race again!" << endl;
-                cin >> race;
-            }
+                raceSelected = true;
+                
+                if(race == "Human"){
 
-            system("cls");
+                indef = "a";
+                adj = "human";
+
+                str = 6;
+                agi = 5;
+                intel = 4;
+                }
+
+                else if(race == "Elf"){
+
+                indef = "an";
+                adj = "elven";
+
+                str = 3;
+                agi = 6;
+                intel = 6;
+                }
+
+                else if(race == "Orc"){
+
+                indef = "an";
+                adj = "orcish";
+
+                str = 8;
+                agi = 4;
+                intel = 3;
+                }
+
+                else if(race == "Dwarf"){
+
+                indef = "a";
+                adj = "dwarven";
+
+                str = 6;
+                agi = 3;
+                intel = 6;
+                }
+
+                else
+                {
+                    cout << "Enter race again!" << endl;
+                    race = textInput();
+                    raceSelected = false;
+                }
+            }
+            while(!raceSelected);
+            
+            system(CLEAR_COMMAND);
 
             cout << "===============================================================================\n";
             cout << "============================TEXT QUEST=========================================\n";
@@ -975,38 +1075,46 @@ int main(){
             cout << endl << "Warrior";
             cout << endl << "Ranger";
             cout << endl << "Mage" << endl << endl;
-            cin >> type;
+            type = textInput();
 
-            if(type == "Warrior"){
+            bool typeSelected = false;
 
-            str += 1;
+            do 
+            {
+                typeSelected = true;
+                if(type == "Warrior"){
 
-            ttext = "warrior";
+                str += 1;
 
-            }
-            else if(type == "Ranger"){
+                ttext = "warrior";
 
-                if(race == "Elf")
-                {
-                    agi += 2;
+                }
+                else if(type == "Ranger"){
+
+                    if(race == "Elf")
+                    {
+                        agi += 2;
+                    }
+                    else
+                    {
+                        agi += 1;
+                    }
+                ttext = "ranger";
+                }
+                else if(type == "Mage"){
+
+                intel += 1;
+
+                ttext = "mage";
                 }
                 else
                 {
-                    agi += 1;
+                    cout << "Please choose type again!" << endl;
+                    type = textInput();
+                    typeSelected = false;
                 }
-            ttext = "ranger";
             }
-            else if(type == "Mage"){
-
-            intel += 1;
-
-            ttext = "mage";
-            }
-            else
-            {
-                cout << "Please choose type again!" << endl;
-                cin >> type;
-            }
+            while(!typeSelected);
 /*
             cout << endl << "Name: " << name << endl;
             cout << "Gender: " << gender << endl;
@@ -1016,8 +1124,8 @@ int main(){
             cout << "Agility: " << agi << endl;
             cout << "Intelligence: " << intel << endl << endl;
 */
-            system("pause");
-            system("cls");
+            waitForAnyKey();
+            system(CLEAR_COMMAND);
 
             cout << "===============================================================================\n";
             cout << "============================TEXT QUEST=========================================\n";
@@ -1026,8 +1134,8 @@ int main(){
             cout << endl << "Our story concerns a brave " << adj << " " << ttext << " called " << name << ".";
             cout << endl << "Once upon a time, " << name << " came across a dark, murky cave, and decided to venture\ninside...\n\n" << endl;
 
-            system("pause");
-            system("cls");
+            waitForAnyKey();
+            system(CLEAR_COMMAND);
 
             cout << "===============================================================================\n";
             cout << "============================TEXT QUEST=========================================\n";
@@ -1044,7 +1152,7 @@ int main(){
             while(Loop == true)
             {
 
-                cin >> levelchoice;
+                levelchoice = textInput();
 
                 if(levelchoice == "Yes"){
                 level = 1;
@@ -1071,7 +1179,7 @@ int main(){
 
                     cout << "You walk away from the cave, but curiosity gets the better of you, so you \nreturn.\n\n";
 
-                    system("pause");
+                    waitForAnyKey();
 
                     level = 1;
 
@@ -1084,7 +1192,7 @@ int main(){
 
                 case 1:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                 cout << "===============================================================================\n";
                 cout << "============================TEXT QUEST=========================================\n";
@@ -1097,7 +1205,7 @@ int main(){
 
                     cout << "After entering the cave, you walk until you reach a 3 way split in the path. \nYou mark the room on your map as A." << endl;
                     cout << endl << "Would you like to go North, West, South or East? ";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
 
 
 
@@ -1109,7 +1217,7 @@ int main(){
                     }
                     else if(levelchoice == "South"){
                     cout << endl << "You are a coward!\n\n";
-                    system("pause");
+                    waitForAnyKey();
                     gameOn = false;
                     }
                     else if(levelchoice == "East"){
@@ -1129,7 +1237,7 @@ int main(){
 
                     cout << "Unrecognised command!" << endl << endl;
 
-                    system("pause");
+                    waitForAnyKey();
                     goto newlevel;
 
                     }
@@ -1144,7 +1252,7 @@ int main(){
             case 2:
 
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                 cout << "===============================================================================\n";
                 cout << "============================TEXT QUEST=========================================\n";
@@ -1161,7 +1269,7 @@ int main(){
                     cout << "You arrive at a blue door, it is clearly tightly locked.\nYou try to shove the door open but it won't give!";
                     cout << endl << "Your only choice is to turn back!\n" << endl << endl;
 
-                    system("pause");
+                    waitForAnyKey();
 
                     level = 1;
                     goto newlevel;
@@ -1171,7 +1279,7 @@ int main(){
 
                     cout << "The blue door opens after you turn the key in the lock.\n";
                     cout << "Do you head East to A or head South down the corridor? ";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
 
                     if(levelchoice == "East"){
                         level = 1;
@@ -1186,7 +1294,7 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
 
                     }
@@ -1206,7 +1314,7 @@ int main(){
 //=================================================================================================================================================================
        case 3:
 
-            system("cls");
+            system(CLEAR_COMMAND);
 
 
                 cout << "===============================================================================\n";
@@ -1229,7 +1337,7 @@ int main(){
                     cout << "             loneliness once more! How can I be sure you'll be\n";
                     cout << "             successful?\n\n";
 
-                    system("pause");
+                    waitForAnyKey();
 
                     cout << endl << "You must prove your worth to the blue knight! Will you: ";
                     cout << endl << "Pickpocket";
@@ -1238,7 +1346,7 @@ int main(){
 
                     reinputblue:
 
-                    cin >> blue;
+                    blue = textInput();
 
                     if(blue == "Pickpocket" && agi >= 6){
 
@@ -1252,7 +1360,7 @@ int main(){
                         cout << "Would you like to leave through the North door or East door? ";
 
                         redoblue:
-                        cin >> levelchoice;
+                        levelchoice = textInput();
 
                         if(levelchoice == "North"){
                         level = 5;
@@ -1265,7 +1373,7 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto redoblue;
                         }
                     }
@@ -1274,7 +1382,7 @@ int main(){
                         cout << name << ": Woah, you're crazy! I'm leaving!\n\n";
                         cout << "As you move to leave the room the Blue Knight turns\nhis back to you, giving you the perfect/nopportunity to steal his shiny key!\nBut you stumble as you reach for his belt and alert him to\nyour presence!\nThe Blue Knight deems you unworthy and chops off your head!/n/n";
 
-                        system("pause");
+                        waitForAnyKey();
                         gameOn = false;
                     }
 
@@ -1283,8 +1391,7 @@ int main(){
                         weaponloop:
                         cout << "Choose a weapon from your inventory to fight with! ";
 
-                        cin.sync();
-                        getline(cin, weapon);
+                        weapon = textInput();
 
                         if(weapon == "Pointed Stick" && ps == 0){
                         cout << "You have no pointed stick!\n";
@@ -1316,7 +1423,7 @@ int main(){
                         else if(weapon != "Bow" || weapon != "Sword" || weapon != "Pointed Stick")
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto weaponloop;
                         }
 
@@ -1335,12 +1442,12 @@ int main(){
                             skey = 1;
                             sw = 1;
                             blueknight = 0;
-                            system("pause");
+                            waitForAnyKey();
                             cout << "Would you like to leave through the North or East door? ";
 
                             reinputC1:
 
-                            cin >> levelchoice;
+                            levelchoice = textInput();
                             if(levelchoice == "North"){
                             level = 5;
                             goto newlevel;
@@ -1352,14 +1459,14 @@ int main(){
                             else
                             {
                                 cout << "Unrecognised command!" << endl;
-                                system("pause");
+                                waitForAnyKey();
                                 goto reinputC1;
                             }
                         }
                         else if(fight <= 6){
                         cout << "You engage in combat with the Blue Knight, but you are slain\ndue to his superior experience.\nYou are dead!";
 
-                        system("PAUSE");
+                        waitForAnyKey();
                         gameOn = false;
                         }
                         weapstr = 0;
@@ -1372,17 +1479,17 @@ int main(){
 
                         cout << name << ": Come on, sir knight, I'm sure you don't get people\ncoming through here very often\nthis could be your last chance at\nfreedom!";
                         cout << endl << endl;
-                        system("pause");
+                        waitForAnyKey();
                         cout << "Blue Knight: Oh, I suppose you're right!\nHere, take this key, and my sword!";
                         cout << endl << endl;
 
-                        system("pause");
+                        waitForAnyKey();
                         skey = 1;
                         sw = 1;
                         blueknight = 0;
 
                         cout << "Would you like to leave through the North or East door?";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
 
                         reinputC2:
                         if(levelchoice == "North"){
@@ -1396,25 +1503,25 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto reinputC2;
                         }
                     }
                     else if(blue == "Persuade" && intel <=5){
                         cout << name << ": Look, I don't like you and you don't like me,\njust give me the damn key!\n";
                         cout << endl << endl;
-                        system("pause");
+                        waitForAnyKey();
                         cout << "Blue Knight: I'm afraid I don't much like your tone!\n";
                         cout << "The Blue Knight draws his sword and stabs you through the heart\nfor your insolence!\n";
 
-                        system("PAUSE");
+                        waitForAnyKey();
 
                         gameOn = false;
                     }
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto reinputblue;
 
                     }
@@ -1423,7 +1530,7 @@ int main(){
                 }
                 else if(blueknight == 0){
                     cout << "You return to the Blue Knight's Lair.\nWould you like to leave through the North or East door?\n";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
                     if(levelchoice == "North"){
                     level = 5;
                     goto newlevel;
@@ -1435,7 +1542,7 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
 
@@ -1454,7 +1561,7 @@ int main(){
 
             case 4:
 
-                system("cls");
+                system(CLEAR_COMMAND);
                 cout << "===============================================================================\n";
                 cout << "============================TEXT QUEST=========================================\n";
                 cout << "==============================ROOM D===========================================\n\n";
@@ -1465,7 +1572,7 @@ int main(){
                 drawinventory();
 
                 cout << "You reach a split in the path, would you like to go North, South or West?\n";
-                cin >> levelchoice;
+                levelchoice = textInput();
                 if(levelchoice == "North"){
                     level = 6;
                     goto newlevel;
@@ -1482,7 +1589,7 @@ int main(){
                 else
                 {
                     cout << "Unrecognised command!" << endl;
-                    system("pause");
+                    waitForAnyKey();
                     goto newlevel;
                 }
 
@@ -1494,7 +1601,7 @@ int main(){
 
          case 5:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                 cout << "===============================================================================\n";
                 cout << "============================TEXT QUEST=========================================\n";
@@ -1510,7 +1617,7 @@ int main(){
                     cout << "You arrive at a blue door, it is clearly tightly locked.\nYou try to shove the door open but it won't give!";
                     cout << endl << "Your only choice is to turn back!\n" << endl << endl;
 
-                    system("pause");
+                    waitForAnyKey();
 
                     level = 4;
                     goto newlevel;
@@ -1519,7 +1626,7 @@ int main(){
 
                     cout << "The blue door opens after you turn the key in the lock.\n";
                     cout << "Do you head East to D or head South down the corridor? ";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
 
                     if(levelchoice == "East"){
                         level = 4;
@@ -1534,7 +1641,7 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
                 }
@@ -1546,7 +1653,7 @@ int main(){
 
         case 6:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                 cout << "===============================================================================\n";
                 cout << "============================TEXT QUEST=========================================\n";
@@ -1558,7 +1665,7 @@ int main(){
                 drawinventory();
 
                 cout << "You reach a crossroads.\nDo you go East, South or West? ";
-                cin >> levelchoice;
+                levelchoice = textInput();
                 cout << endl;
 
                 if(levelchoice == "East"){
@@ -1576,7 +1683,7 @@ int main(){
 
                     cout << "You begin to walk down the corridor when suddenly you hear\na mechanical click.\nArrows then fly out of the wall at you!\n\n";
 
-                        system("pause");
+                        waitForAnyKey();
                     cout << endl;
 
                     trap = agi + intel;
@@ -1588,7 +1695,7 @@ int main(){
                         trap = 0;
                         trap1 = 2;
 
-                        system("pause");
+                        waitForAnyKey();
 
                         level = 6;
                         goto newlevel;
@@ -1597,7 +1704,7 @@ int main(){
                     else if(trap <= 9){
                         cout << "The next thing you know you find yourself with \n4 arrows embedded in your chest!\n\nYou are dead!";
 
-                        system("pause");
+                        waitForAnyKey();
 
                         gameOn = false;
                     }
@@ -1605,7 +1712,7 @@ int main(){
                 else if(trap1 == 2){
                     cout << "You examine the intricately placed crossbows in the wall.\nThen walk back the way you came.\n\n";
                     level = 6;
-                    system("pause");
+                    waitForAnyKey();
                     goto newlevel;
                 }
 
@@ -1613,7 +1720,7 @@ int main(){
                 else
                 {
                     cout << "Unrecognised command!" << endl;
-                    system("pause");
+                    waitForAnyKey();
                     goto newlevel;
                 }
 
@@ -1628,7 +1735,7 @@ int main(){
 
         case 7:
 
-            system("cls");
+            system(CLEAR_COMMAND);
 
                 cout << "===============================================================================\n";
                 cout << "============================TEXT QUEST=========================================\n";
@@ -1643,13 +1750,13 @@ int main(){
 
                 cout << "You see a skeleton leant against the wall holding a bow, do you take the bow or leave it? ";
 
-                cin >> take;
+                take = textInput();
 
                 cout << endl;
 
                 if(take == "Take"){
                 cout << "You try to wrestle the bow out of the skeleton's cold, dead grasp\nBut suddenly it stirs and grabs your arm!\n\n";
-                system("pause");
+                waitForAnyKey();
                 cout << endl;
                     if(type == "Warrior"){
 
@@ -1671,7 +1778,7 @@ int main(){
                 else
                 {
                     cout << "Unrecognised command!" << endl;
-                    system("pause");
+                    waitForAnyKey();
                     goto newlevel;
                 }
 
@@ -1683,7 +1790,7 @@ int main(){
 
 
                 cout << "Would you like to go North, East, or West? ";
-                cin >> levelchoice;
+                levelchoice = textInput();
                 if(levelchoice  == "North"){
                     level = 24;
                     goto newlevel;
@@ -1700,7 +1807,7 @@ int main(){
                 else
                 {
                     cout << "Unrecognised command!" << endl;
-                    system("pause");
+                    waitForAnyKey();
                     goto newlevel;
                 }
             break;
@@ -1710,7 +1817,7 @@ int main(){
 
         case 8:
 
-            system("cls");
+            system(CLEAR_COMMAND);
 
 
                 cout << "===============================================================================\n";
@@ -1734,7 +1841,7 @@ int main(){
                 cout << "You return down the corridor.\n\n";
 
                 level = 24;
-                system("pause");
+                waitForAnyKey();
                 goto newlevel;
 
     break;
@@ -1743,7 +1850,7 @@ int main(){
 
         case 9:
 
-            system("cls");
+            system(CLEAR_COMMAND);
 
                 cout << "===============================================================================\n";
                 cout << "============================TEXT QUEST=========================================\n";
@@ -1756,7 +1863,7 @@ int main(){
 
             cout << "You reach a crossroads.\n";
             cout << "Would you like to go East, South or West.\n";
-            cin >> levelchoice;
+            levelchoice = textInput();
             if(levelchoice == "East"){
                 level = 10;
                 goto newlevel;
@@ -1767,7 +1874,7 @@ int main(){
 
                     cout << "You walk south down the corridor and see that\none of the bricks in the wall is slightly loose.\nAfter pulling it out the wall begins to crumble and fall.\n";
 
-                    system("pause");
+                    waitForAnyKey();
 
                     trap = (agi*2) + str;
                     if(trap >= 15){
@@ -1777,7 +1884,7 @@ int main(){
                         trap = 0;
                         level = 9;
 
-                        system("PAUSE");
+                        waitForAnyKey();
                         goto newlevel;
 
                     }
@@ -1785,9 +1892,9 @@ int main(){
                         cout << "You are entombed under bricks and rubble and remain there forever!\n";
                         cout << "You are dead!\n\n";
 
-                        system("cls");
+                        system(CLEAR_COMMAND);
 
-                        system("PAUSE");
+                        waitForAnyKey();
 
                         gameOn = false;
 
@@ -1796,7 +1903,7 @@ int main(){
                 else if(trap3 == 2){
                     cout << "You search through the rubble for something interesting\nbut find nothing!\nSo you return to room I.\n\n";
 
-                    system("pause");
+                    waitForAnyKey();
 
                     level = 9;
                     goto newlevel;
@@ -1810,7 +1917,7 @@ int main(){
             else
             {
                 cout << "Unrecognised command!" << endl;
-                system("pause");
+                waitForAnyKey();
                 goto newlevel;
             }
 
@@ -1821,7 +1928,7 @@ int main(){
 
         case 10:
 
-            system("cls");
+            system(CLEAR_COMMAND);
 
                 cout << "===============================================================================\n";
                 cout << "============================TEXT QUEST=========================================\n";
@@ -1836,7 +1943,7 @@ int main(){
                 if(rkey == 0){
                     cout << "You try to force the door but it won't budge!\n";
                     cout << "Would you like to go East or West? ";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
                     if(levelchoice == "East"){
                         level = 11;
                         goto newlevel;
@@ -1848,14 +1955,14 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
                 }
                 else if(rkey == 1){
                     cout << "You try the red key in the door and it swings open!\n";
                     cout << "Would you like to go North, East or West? ";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
 
                     if(levelchoice == "North"){
                         level = 25;
@@ -1872,7 +1979,7 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
 
@@ -1885,7 +1992,7 @@ int main(){
 
             case 11:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -1897,7 +2004,7 @@ int main(){
                 drawinventory();
 
                 cout << "You reach a turn in the road.\nWould you like to go East, South or West?\n";
-                cin >> levelchoice;
+                levelchoice = textInput();
 
                 if(levelchoice == "East"){
 
@@ -1918,7 +2025,7 @@ int main(){
                         trap = 0;
 
                         level = 11;
-                        system("pause");
+                        waitForAnyKey();
 
                         goto newlevel;
                     }
@@ -1926,7 +2033,7 @@ int main(){
 
                         cout << "You are trapped forever!\n";
                         cout << "You will eventually be dead!\n\n";
-                        system("pause");
+                        waitForAnyKey();
 
                         gameOn = false;
                         break;
@@ -1937,7 +2044,7 @@ int main(){
 
                         cout << "The niche remains empty.\nYou return to K on your map\n\n";
 
-                        system("pause");
+                        waitForAnyKey();
 
                         level = 11;
 
@@ -1955,7 +2062,7 @@ int main(){
                 else
                 {
                     cout << "Unrecognised command!" << endl;
-                    system("pause");
+                    waitForAnyKey();
                     goto newlevel;
                 }
 
@@ -1965,7 +2072,7 @@ int main(){
 
             case 12:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -1978,7 +2085,7 @@ int main(){
                 drawinventory();
 
                 cout << "You see a corridor going off to the North.\nWould you like to go North, East or West? ";
-                cin >> levelchoice;
+                levelchoice = textInput();
 
                 if(levelchoice == "North"){
                     level = 13;
@@ -1995,7 +2102,7 @@ int main(){
                 else
                 {
                     cout << "Unrecognised command!" << endl;
-                    system("cls");
+                    system(CLEAR_COMMAND);
                     goto newlevel;
                 }
         break;
@@ -2004,7 +2111,7 @@ int main(){
 
             case 13:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2022,14 +2129,14 @@ int main(){
 
                         reinputtask:
 
-                        cin >> task;
+                        task = textInput();
                         cout << endl;
 
                         if(task == "Shoot"){
 
                             if(bw == 0 || ar == 0){
                                 cout << "You cannot do this unless you have a bow and arrows.\n\n";
-                                system("pause");
+                                waitForAnyKey();
 
                                 goto retry;
                             }
@@ -2044,7 +2151,7 @@ int main(){
 
                                         cout << "You leave to the South.\n\n";
 
-                                        system("pause");
+                                        waitForAnyKey();
 
                                         level = 12;
                                         goto newlevel;
@@ -2053,7 +2160,7 @@ int main(){
                                         cout << "You carefully aim your bow and release an arrow,\nbut miss!\n\n";
                                         ar --;
 
-                                        system("pause");
+                                        waitForAnyKey();
 
                                         goto retry;
                                     }
@@ -2069,7 +2176,7 @@ int main(){
 
                                     cout << "You leave to the South.\n\n";
 
-                                    system("pause");
+                                    waitForAnyKey();
 
                                 level = 12;
 
@@ -2079,7 +2186,7 @@ int main(){
 
                                     cout << "When you reach the top, you grab the key, \nbut fall and die!\nYou are dead!\n\n";
 
-                                    system("pause");
+                                    waitForAnyKey();
 
                                     gameOn = false;
                                 }
@@ -2091,7 +2198,7 @@ int main(){
                                 if(str >= 7){
                                     cout << "The key wobbles and falls into your hands!\n\n";
 
-                                    system("PAUSE");
+                                    waitForAnyKey();
                                     rkey = 1;
                                     level = 12;
                                     goto newlevel;
@@ -2099,7 +2206,7 @@ int main(){
                                 else if(str <= 6){
                                     cout << "The key stays where it is and\n you hurt your hand badly!\n\n";
 
-                                    system("PAUSE");
+                                    waitForAnyKey();
                                     str --;
                                     goto retry;
                                 }
@@ -2118,7 +2225,7 @@ int main(){
                         else if(rkey == 1){
                             cout << "The room is completely empty, so you\nreturn to L.\n\n";
 
-                            system("pause");
+                            waitForAnyKey();
 
                             level = 12;
 
@@ -2130,7 +2237,7 @@ int main(){
 
             case 14:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2143,7 +2250,7 @@ int main(){
 
                     if(trap5 == 0){
                     cout << "You reach a split in the path.\nA skeleton lies on the floor with a shield.\nWould you like to go North or West?\nOr take the shield?\n";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
 
                     if(levelchoice == "North"){
                         level = 15;
@@ -2152,7 +2259,7 @@ int main(){
                     else if(levelchoice == "Take"){
                         trap5 = 1;
                             cout << "The skeleton gets up and begins to attack you!\n\n";
-                            system("pause");
+                            waitForAnyKey();
 
                             weapstr = str + sw;
 
@@ -2160,7 +2267,7 @@ int main(){
                                 cout << "You smash the skeleton with the pointed stick,\nthen push the shield back into it!\nBoth are destroyed in the process!\n\n";
 
                                 trap5 = 2;
-                                system("pause");
+                                waitForAnyKey();
 
                                 level = 14;
                                 goto newlevel;
@@ -2168,7 +2275,7 @@ int main(){
                             else
                             {
                                 cout << "The skeleton batters you to death as your \nfutile attempts to fight back make it angrier and angrier!\nYou are dead!\n";
-                                system("PAUSE");
+                                waitForAnyKey();
                                 gameOn = false;
                             }
                     }
@@ -2179,13 +2286,13 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
                     }
                     else if(trap5 == 2){
                         cout << "You reach a split in the path.\nWould you like to go North, East or West?\n";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
                         if(levelchoice == "North"){
                             level = 15;
                             goto newlevel;
@@ -2197,7 +2304,7 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!";
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
@@ -2207,7 +2314,7 @@ int main(){
 
             case 15:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2220,7 +2327,7 @@ int main(){
 
                     if(gk == 0){
                         cout << "You reach a green door that appears to be locked!\nYou try to force it but it won't budge!\nWould you like to go East or West?\n";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
                         if (levelchoice == "East"){
                             level = 17;
                             goto newlevel;
@@ -2232,13 +2339,13 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
                     if(gk == 1){
                         cout << "You use the Green Acid to melt the lock!\nThe door swings open!\nWould you like to go North, East or West? ";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
                         if(levelchoice == "North"){
                             level = 16;
                             goto newlevel;
@@ -2254,7 +2361,7 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
@@ -2266,7 +2373,7 @@ int main(){
 
             case 16:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2282,14 +2389,14 @@ int main(){
                         cout << "As you walk into the room you see a Knight cowering\nin the corner.\n";
                         cout << "Yellow Knight: W-w-w-who's there?!\n\n";
 
-                        system("pause");
+                        waitForAnyKey();
 
                         cout << name << ": It is I, " << name << endl << endl;
 
                         retry2:
 
                         cout << "You speak a little too loudly, and the Yellow\nKnight begins to run away!\n\nWill you pursue him, paralyse him or try to persuade\nhim to come back?\n";
-                        cin >> yellow;
+                        yellow = textInput();
 
                         if(yellow == "Pursue"){
                             fight = str + agi;
@@ -2302,14 +2409,14 @@ int main(){
                                     cout << "You leave the room and return to O.\n\n";
                                     fight = 0;
                                     level = 15;
-                                    system("pause");
+                                    waitForAnyKey();
 
                                     goto newlevel;
 
                                 }
                                 else if(fight <= 9){
                                     cout << "You cannot catch up to the Yellow Knight\nyour heart tells you that you cannot \ncontinue your quest!\n\n";
-                                    system("pause");
+                                    waitForAnyKey();
                                     gameOn = false;
                                 }
 
@@ -2327,13 +2434,13 @@ int main(){
                                     ar --;
                                     yellowknight = 0;
                                     cout << "You leave the room and return to the corridor.\n\n";
-                                    system("pause");
+                                    waitForAnyKey();
                                     level = 15;
                                     goto newlevel;
                                 }
                                 else if(weapagi <= 7){
                                     cout << "Your shot misses!\nYou sense that your quest is now impossible\nso you leave the cave.\n\n";
-                                    system("pause");
+                                    waitForAnyKey();
                                     gameOn = false;
                                 }
                             }
@@ -2341,30 +2448,30 @@ int main(){
                         else if(yellow == "Persuade" && intel >= 6){
                             cout << name << "Ok, Ok, I'm not going to hurt you!\nJust give me your key and I'll leave you in peace!\n\n";
 
-                            system("pause");
+                            waitForAnyKey();
 
                             cout << "Yellow Knight: Alright, here you go...\n\n";
 
                             yk = 1;
                             yellowknight = 0;
-                            system("pause");
+                            waitForAnyKey();
                             cout << "You leave the room and return to the corridor\n";
                             level = 15;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                         else if(yellow == "Persuade" && intel <= 5){
                             cout << name << ": OI! OI! GET BACK HERE!\n\n";
-                            system("pause");
+                            waitForAnyKey();
                             cout << "The Yellow Knight runs even faster\nyou sense that your quest is now impossible\nyou leave the cave\n\n";
 
-                            system("pause");
+                            waitForAnyKey();
                             gameOn = false;
                         }
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto retry2;
 
                         }
@@ -2372,7 +2479,7 @@ int main(){
 
                     else if(yellowknight == 0){
                         cout << "You examine the room again, and find nothing.\nYou leave the room and return to the corridor.\n\n";
-                        system("pause");
+                        waitForAnyKey();
                         level = 15;
                         goto newlevel;
                     }
@@ -2385,7 +2492,7 @@ int main(){
 
             case 17:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2402,7 +2509,7 @@ int main(){
                     if(yk == 0){
                         cout << "You reach a yellow door, you try to force it open\nbut it won't budge!\n\n";
                         cout << "Would you like to go East or West? ";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
                         if(levelchoice == "East"){
                             level = 19;
                             goto newlevel;
@@ -2414,13 +2521,13 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
                     else if(yk == 1){
                         cout << "You try the key in the door and it swings open.\nWould you like to go East, South or West?\n";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
                         if(levelchoice == "East"){
                             level = 19;
                             goto newlevel;
@@ -2436,7 +2543,7 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
@@ -2448,7 +2555,7 @@ int main(){
 
             case 18:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2471,12 +2578,11 @@ int main(){
 
                     while(item == 0){
 
-                        cin.sync();
-                        getline(cin, item1);
+                        item1 = textInput();
 
                             if(item1 == "None"){
                                 cout << "You decide not to take anything and leave the room!\n\n";
-                                system("pause");
+                                waitForAnyKey();
 
                                 level = 17;
                                 goto newlevel;
@@ -2541,7 +2647,7 @@ int main(){
 
                         while(item == 1){
 
-                            getline(cin, item2);
+                            item2 = textInput();
 
                                 if(item2 == "Rusty Spoon"){
 
@@ -2685,7 +2791,7 @@ int main(){
                     }
                     else if(item == 2){
                         cout << "Do you want to put back your items?\n";
-                        cin >> take;
+                        take = textInput();
                         if(take == "Yes"){
                             item = 0;
                             sf = 0;
@@ -2702,20 +2808,20 @@ int main(){
                             gl = 0;
 
                             cout << "You return to the corridor.\n\n";
-                            system("pause");
+                            waitForAnyKey();
                             level = 17;
                             goto newlevel;
                         }
                         else if(take == "No"){
                             cout << "You return to the corridor.\n\n";
-                            system("pause");
+                            waitForAnyKey();
                             level = 17;
                             goto newlevel;
                         }
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
 
@@ -2723,7 +2829,7 @@ int main(){
 
                     cout << "You leave the room to the north.\n\n";
 
-                    system("PAUSE");
+                    waitForAnyKey();
 
                     level = 17;
 
@@ -2738,7 +2844,7 @@ int main(){
 
             case 19:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2750,7 +2856,7 @@ int main(){
                     drawinventory();
 
                     cout << "You reach a crossroads, would you like to go North, South or West? \n";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
                     if(levelchoice == "North"){
                         level = 20;
                         goto newlevel;
@@ -2767,13 +2873,13 @@ int main(){
                         }
                         else if(agi <= 6){
                             cout << "You try to make your way back to the corridor, but can't move fast enough!\nYou are dead!\n\n";
-                            system("pause");
+                            waitForAnyKey();
                             gameOn = false;
                         }
                     }
                     else if(levelchoice == "South" && trap6 == 2){
                         cout << "You look over the precipice and thank god you were fast enough!\nYou return to the crossroads\n\n";
-                        system("pause");
+                        waitForAnyKey();
                         level = 19;
                         goto newlevel;
                     }
@@ -2784,7 +2890,7 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
 
@@ -2794,7 +2900,7 @@ int main(){
 
             case 20:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2807,12 +2913,12 @@ int main(){
 
                     cout << "You come to a big silver gate!\n\n";
 
-                    system("pause");
+                    waitForAnyKey();
 
                     if(skey == 0){
                         cout << "\nYou grab the bars of the gate and shake them furiously, but the gate remains\nshut!\n";
                         cout << "Would you like to go North or South?\n";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
                         if(levelchoice == "North"){
                             level = 11;
                             goto newlevel;
@@ -2824,15 +2930,15 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
                     else if(skey == 1){
                         cout << "\nYou turn the silver key in the lock and the gate swings open!\n\n";
-                        system("pause");
+                        waitForAnyKey();
                         cout << "Would you like to go North, East or South?\n";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
                         if(levelchoice == "North"){
                             level = 11;
                             goto newlevel;
@@ -2848,7 +2954,7 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
@@ -2860,7 +2966,7 @@ int main(){
 
             case 21:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -2874,7 +2980,7 @@ int main(){
                         cout << "You see a golden gate, and a Knight in wonderfully gilded armour.\n";
                         cout << "Golden Knight: I will not fight you until I've had something to drink!\nYou cannot pass without fighting me honourably!\n\n";
 
-                        system("pause");
+                        waitForAnyKey();
 
                             if(wc == 1 || gl == 1){
                                 cout << "You give the fill the cup with mead from the keg to the\nside of the room.\nThen give it to the knight.\n";
@@ -2883,7 +2989,7 @@ int main(){
                                 wc = 0;
                                 gl = 0;
 
-                                system("pause");
+                                waitForAnyKey();
                                 tries = 2;
 
                                 tryagain:
@@ -2891,25 +2997,24 @@ int main(){
 
                                 if(tries != 0){
 
-                                cin.sync();
-                                getline(cin, weapon);
+                                weapon = textInput();
 
                                 if(weapon == "Sword"){
 
                                     if(sw >= 1){
                                         cout << "You engage the Knight in honourable combat!\nAfter a tough fight you emerge victorious!\n\n";
-                                        system("pause");
+                                        waitForAnyKey();
                                         cout << "Golden Knight: You have bested me in single combat! Here is the key to the gate!\n\n";
                                         gkey = 1;
                                         goldknight = 0;
                                         cout << "You open the gate an head through to the next challenge...\n\n";
                                         level = 22;
-                                        system("pause");
+                                        waitForAnyKey();
                                         goto newlevel;
                                     }
                                     else if(sw == 0){
                                         cout << "You must have a sword for this option!\n\n";
-                                        system("pause");
+                                        waitForAnyKey();
                                         goto tryagain;
                                     }
                                 }
@@ -2917,18 +3022,18 @@ int main(){
                                 {
                                     if(ps >= 1){
                                         cout << "You engage the Knight in honourable combat!\nAfter a tough fight you emerge victorious!\n\n";
-                                        system("pause");
+                                        waitForAnyKey();
                                         cout << "Golden Knight: You have bested me in single combat! Here is the key to the gate!\n\n";
                                         gkey = 1;
                                         goldknight = 0;
                                         cout << "You open the gate an head through to the next challenge...\n\n";
                                         level = 22;
-                                        system("pause");
+                                        waitForAnyKey();
                                         goto newlevel;
                                     }
                                     else if(ps == 0){
                                         cout << "You must have a sword for this option!\n\n";
-                                        system("pause");
+                                        waitForAnyKey();
                                         goto tryagain;
                                     }
 
@@ -2943,7 +3048,7 @@ int main(){
                                     }
                                     else if(bw == 0 || ar == 0){
                                         cout << "You must have a bow and at least one arrow for this option!\n\n";
-                                        system("pause");
+                                        waitForAnyKey();
                                         goto tryagain;
                                     }
                                 }
@@ -2962,20 +3067,20 @@ int main(){
                             }
                             else if(tries == 0){
                                 cout << "The Golden Knight has defeated you!\nYou are dead!\n\n";
-                                system("pause");
+                                waitForAnyKey();
                                 gameOn = false;
                             }
                             }
                             else if(gl == 0 && wc == 0){
                                 cout << "You have no way of giving the Knight a drink, so\nyou turn back!\n\n";
-                                system("pause");
+                                waitForAnyKey();
                                 level = 20;
                                 goto newlevel;
                             }
                     }
                     else if(goldknight == 0){
                         cout << "You see the Golden Knight happily drinking by the keg of mead.\nWould you like to go East or West? ";
-                        cin >> levelchoice;
+                        levelchoice = textInput();
                         if(levelchoice == "East"){
                             level = 22;
                             goto newlevel;
@@ -2987,7 +3092,7 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
@@ -2998,7 +3103,7 @@ int main(){
 
             case 22:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -3016,8 +3121,7 @@ int main(){
 
                         weaponloopV:
 
-                        cin.sync();
-                        getline(cin, weapon);
+                        weapon = textInput();
 
                         if(weapon == "Sword"){
 
@@ -3027,7 +3131,7 @@ int main(){
                             }
                             else if(sw == 0){
                                 cout << "You must have a sword for this option!\n\n";
-                                system("pause");
+                                waitForAnyKey();
                                 goto tryagain2;
                             }
 
@@ -3039,7 +3143,7 @@ int main(){
 
                                     cout << "Black Knight: You have bested me, but I warn you, what lies beyond this gate\nis more terrible than you could ever imagine!\nWould you like to proceed anyway?\n";
 
-                                    cin >> blackgate;
+                                    blackgate = textInput();
 
                                     if(blackgate == "Yes"){
                                         level = 23;
@@ -3053,7 +3157,7 @@ int main(){
                                 else if(weapstr <= 7){
 
                                     cout << "The Black Knight runs you through with his sword!/nYou are dead!\n\n";
-                                    system("pause");
+                                    waitForAnyKey();
 
                                     gameOn = false;
                                 }
@@ -3071,7 +3175,7 @@ int main(){
 
                                         cout << "Black Knight:  You have bested me, but I warn you, what lies beyond this gate\nis more terrible than you could ever imagine!\nWould you like to proceed anyway?\n";
 
-                                    cin >> blackgate;
+                                    blackgate = textInput();
 
                                     if(blackgate == "Yes"){
                                         level = 23;
@@ -3085,14 +3189,14 @@ int main(){
                                     else if(weapagi <= 7){
                                         cout << "Despite loosing an arrow towards your opponent your shots are\nuseless.\nThe Black Knight kills you!\nYou are dead!\n\n";
 
-                                        system("pause");
+                                        waitForAnyKey();
 
                                         gameOn = false;
                                     }
                             }
                             else if(bw == 0 || ar == 0){
                                 cout << "You must have a bow and at least one arrow for this option!\n\n";
-                                system("pause");
+                                waitForAnyKey();
                                 goto tryagain2;
                             }
                         }
@@ -3106,7 +3210,7 @@ int main(){
 
                                     cout << "Black Knight: You have bested me, but I warn you, what lies beyond this gate\nis more terrible than you could ever imagine!\nWould you like to proceed anyway?\n";
 
-                                    cin >> blackgate;
+                                    blackgate = textInput();
 
                                     if(blackgate == "Yes"){
                                         level = 23;
@@ -3119,7 +3223,7 @@ int main(){
                                 }
                                 else if(weapintel <= 7){
                                     cout << "You try to freeze the Black Knight in his armour, but it fails!\nThe Black Knight kills you!\nYou are dead!\n\n";
-                                    system("pause");
+                                    waitForAnyKey();
                                     gameOn = false;
                                 }
                         }
@@ -3132,7 +3236,7 @@ int main(){
                     }
                     else if(blackknight == 0){
                         cout << "Black Knight: Are you ready to enter?\n";
-                        cin >> blackgate;
+                        blackgate = textInput();
                         if(blackgate == "Yes"){
                             level = 23;
                             goto newlevel;
@@ -3144,7 +3248,7 @@ int main(){
                         else
                         {
                             cout << "Unrecognised command!" << endl;
-                            system("pause");
+                            waitForAnyKey();
                             goto newlevel;
                         }
                     }
@@ -3158,7 +3262,7 @@ int main(){
 
             case 23:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -3175,7 +3279,7 @@ int main(){
 
                     cout << "You enter a large cave like room...\n\n";
 
-                    system("pause");
+                    waitForAnyKey();
 
                     cout << "Suddenly, a dragon appears from the back of the cave!\n\n";
 
@@ -3183,34 +3287,33 @@ int main(){
 
                     if(tries != 0){
                     cout << "Choose a weapon from your inventory to fight with or try to cast a spell!\n";
-                    cin.sync();
-                    getline(cin, weapon);
+                    weapon = textInput();
 
                         if(weapon == "Rusty Spoon"){
 
                             cout << "You look at the rusty spoon and wield it!\nPower begins to channel through it, and it begins to glow.\nYou hurl the spoon at the dragon with all your might!\nIt hits the dragon, and the beast shatters into a million pieces!\nYou have succesfully completed TextQuest!\n\n";
 
-                            system("pause");
+                            waitForAnyKey();
                             gameOn = false;
                         }
                         else if(weapon == "Sword"){
                             if(sw != 0){
                                 cout << "You swing your sword against the dragon and it smashes hard against\nthe dragon's scales!\n\n";
-                                system("pause");
+                                waitForAnyKey();
 
                                 tries --;
                                 goto tryagain3;
                             }
                             if(sw == 0){
                                 cout << "You must have a sword for this option!\n\n";
-                                system("pause");
+                                waitForAnyKey();
                                 goto tryagain3;
                             }
                         }
                         else if(weapon == "Bow"){
                             if(bw != 0 && ar != 0){
                                 cout << "You quickly fire off an arrow at the dragon, but it bounces off the dragon's scales!\n\n";
-                                system("pause");
+                                waitForAnyKey();
 
                                 ar --;
                                 tries --;
@@ -3219,7 +3322,7 @@ int main(){
                             }
                             else if(bw == 0 || ar == 0){
                                 cout << "You must have a bow and at least one arrow fo rthis option!\n\n";
-                                system("pause");
+                                waitForAnyKey();
                                 goto tryagain3;
                             }
                         }
@@ -3228,20 +3331,20 @@ int main(){
 
                                 tries --;
 
-                            system("pause");
+                            waitForAnyKey();
                             goto tryagain3;
                         }
                         else if(weapon == "Rusty Knife"){
                             if(rk == 0){
                                 cout << "You don't have this item!\n\n";
 
-                                system("pause");
+                                waitForAnyKey();
 
                                 goto tryagain3;
                             }
                             else if(rk == 1){
                                 cout << "You draw the knife, but the blade breaks as you pull it out!\n\n";
-                                system("pause");
+                                waitForAnyKey();
                                 goto tryagain3;
                             }
                         }
@@ -3251,14 +3354,14 @@ int main(){
 
                                 tries --;
 
-                                system("pause");
+                                waitForAnyKey();
 
                                 goto tryagain3;
                             }
                             else if(rf == 0){
                                 cout << "You don't have this item!\n\n";
 
-                                system("pause");
+                                waitForAnyKey();
 
                                 goto tryagain3;
                             }
@@ -3267,14 +3370,14 @@ int main(){
                             if(ss == 0){
                                 cout << "You don't have this item!\n\n";
 
-                                system("pause");
+                                waitForAnyKey();
 
                                 goto tryagain3;
                             }
                             else if(ss == 1){
                                 cout << "Don't be ridiculous! A spoon doesn't even have an edge!\n\n";
 
-                                system("pause");
+                                waitForAnyKey();
 
                                 goto tryagain3;
                             }
@@ -3284,13 +3387,13 @@ int main(){
                                     cout << "You try to stab the dragon with the fork, but its scales are too strong!\n";
                                     tries --;
 
-                                    system("pause");
+                                    waitForAnyKey();
 
                                     goto tryagain3;
                                 }
                                 else  if(sf == 0){
                                     cout << "You don't have this item!\n\n";
-                                    system("pause");
+                                    waitForAnyKey();
 
                                     goto tryagain3;
                                 }
@@ -3300,13 +3403,13 @@ int main(){
                                     cout << "You try to stab the dragon with the knife, but its scales are too strong!\n\n";
                                     tries --;
 
-                                    system("pause");
+                                    waitForAnyKey();
 
                                     goto tryagain3;
                                 }
                                 else  if(sk == 0){
                                     cout << "You don't have this item!\n\n";
-                                    system("pause");
+                                    waitForAnyKey();
 
                                     goto tryagain3;
                                 }
@@ -3316,13 +3419,13 @@ int main(){
                             cout << "You try to smack the dragon with the plate, but its scales are too strong!\n\n";
                             tries --;
 
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                         }
                         else if(wp == 0){
                             cout << "You don't have this item!\n\n";
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                         }
@@ -3332,13 +3435,13 @@ int main(){
                             cout << "You try to smack the dragon with the bowl, but its scales are too strong!\n\n";
                             tries --;
 
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                         }
                         else if(wb == 0){
                             cout << "You don't have this item!\n\n";
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                         }
@@ -3348,13 +3451,13 @@ int main(){
                             cout << "You try to smack the dragon with the plate, but its scales are too strong!\n\n";
                             tries --;
 
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                         }
                         else if(cp == 0){
                             cout << "You don't have this item!\n\n";
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                         }
@@ -3364,26 +3467,26 @@ int main(){
                             cout << "You try to smack the dragon with the bowl, but its scales are too strong!\n\n";
                             tries --;
 
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                         }
                         else if(cb == 0){
                             cout << "You don't have this item!\n\n";
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                         }
                     }
                     else if(weapon == "Wooden Cup"){
                             cout << "You don't have this item!\n\n";
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                     }
                     else if(weapon == "Glass"){
                             cout << "You don't have this item!\n\n";
-                            system("pause");
+                            waitForAnyKey();
 
                             goto tryagain3;
                     }
@@ -3396,7 +3499,7 @@ int main(){
                     }
                     if(tries == 0){
                         cout << "The dragon lunges towards you and eats you!\nYou are dead!\n\n";
-                        system("pause");
+                        waitForAnyKey();
                         gameOn = false;
                     }
 
@@ -3407,7 +3510,7 @@ int main(){
 
             case 24:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -3419,26 +3522,26 @@ int main(){
                     drawinventory();
 
                     cout << "You reach a crossroads do you want to go East, South or West?\n";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
 
                     if(levelchoice == "East" && trap2 == 0){
                         trap2 = 1;
                         cout << "You walk down the corridor when the wall behind you falls,\nblocking your exit. You see a series of symbols on the walls around you.\n\n";
 
-                        system("pause");
+                        waitForAnyKey();
 
                         trap = intel + str;
 
                         if(trap >= 10){
                             cout << "You notice that the pattern of symbols is symmetrical about a certain point.\nOn a hunch you hit that point with all your might and the wall falls \naway. You go down the corridor and return to room Y!\n\n";
-                            system("pause");
+                            waitForAnyKey();
                             trap2 = 2;
                             level = 24;
                             goto newlevel;
                         }
                         else if(trap <= 9){
                             cout << "You are trapped here for eternity!\nYou wil eventually be dead!\n\n";
-                            system("pause");
+                            waitForAnyKey();
                             gameOn = false;
                         }
 
@@ -3459,7 +3562,7 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
 
@@ -3471,7 +3574,7 @@ int main(){
 
             case 25:
 
-                system("cls");
+                system(CLEAR_COMMAND);
 
                     cout << "===============================================================================\n";
                     cout << "============================TEXT QUEST=========================================\n";
@@ -3480,7 +3583,7 @@ int main(){
                     roomZ = 1;
 
                     cout << "You enter a strange room full of dusty tomes and phials full of vibrantly\ncoloured liquids. There is an old book lying open on a desk.\nDo you want to read it, or go South? \n";
-                    cin >> levelchoice;
+                    levelchoice = textInput();
                     if(levelchoice == "Read"){
 
                         cout << "The text reads:                                                             \n";
@@ -3506,7 +3609,7 @@ int main(){
                         }
 
                         level = 10;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
                     else if(levelchoice == "South"){
@@ -3516,7 +3619,7 @@ int main(){
                     else
                     {
                         cout << "Unrecognised command!" << endl;
-                        system("pause");
+                        waitForAnyKey();
                         goto newlevel;
                     }
 
