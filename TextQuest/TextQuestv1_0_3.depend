@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1351190613 source:c:\users\joshua\documents\c++\textquest\textquest v1.0.3\textquestv1_0_3.cpp
+	<iostream>
+	<string>
+	<sstream>
+	<cstdlib>
+	<cstdio>
+
