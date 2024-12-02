@@ -635,7 +635,7 @@ string InputRace()
         }
         else
         {
-            cout << "This is not a race!\n";
+            cout << "This is not a species in TextQuest II!\n";
         }
     }
 
@@ -703,7 +703,7 @@ string InputGender()
         }
         else
         {
-            cout << gender << " is not a gender!" << endl;
+            cout << gender << " is not recognised by this out of date code!" << endl;
         }
     }
     return gender;
