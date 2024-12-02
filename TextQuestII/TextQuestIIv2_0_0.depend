@@ -1,0 +1,145 @@
+# depslib dependency file v1.0
+1355602446 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\screens.cpp
+	<iostream>
+	<string>
+	<cstdlib>
+
+1355246031 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\main.cpp
+	<iostream>
+	<iostream>
+	<string>
+	<sstream>
+	<cstdio>
+	<cstdlib>
+	<fstream>
+	<time.h>
+	"screens.h"
+	"Info.h"
+	"Input.h"
+	"RaceApplication.h"
+	"fight.h"
+	"SaveGame.h"
+	"LoadGame.h"
+	"maps.h"
+	"dice.h"
+	"Puzzles.h"
+	"WorldInteraction.h"
+	"Traps.h"
+	"Investigations.h"
+	"BattleCommands.h"
+
+1354038567 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\screens.h
+
+1356028860 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\info.cpp
+	<iostream>
+	<string>
+	<cstdlib>
+	"screens.h"
+
+1355602884 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\info.h
+
+1355602136 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\input.cpp
+	<iostream>
+	<cstdlib>
+	<string>
+
+1355602912 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\input.h
+	<string>
+
+1355602353 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\raceapplication.cpp
+	<string>
+
+1355602555 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\fight.cpp
+	<iostream>
+	<time.h>
+	<cstdlib>
+	"Info.h"
+	"screens.h"
+	"Input.h"
+	"BattleCommands.h"
+	"AI.h"
+
+1347456285 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\raceapplication.h
+
+1355071457 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\fight.h
+
+1355602446 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\ai.cpp
+	"dice.h"
+
+1355602087 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\battlecommands.cpp
+	<string>
+	"Input.h"
+	"dice.h"
+	"AI.h"
+
+1355602403 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\dice.cpp
+	<iostream>
+	<cstdio>
+	<time.h>
+	<cstdlib>
+
+1344691675 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\dice.h
+
+1354122710 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\ai.h
+
+1355602859 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\battlecommands.h
+
+1355602353 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\savegame.cpp
+	<string>
+	<fstream>
+
+1354038566 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\savegame.h
+
+1355602136 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\loadgame.cpp
+	<string>
+	<fstream>
+	<cstdlib>
+	<iostream>
+
+1354294169 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\loadgame.h
+
+1352236960 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\maps.h
+
+1355602446 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\maps.cpp
+	<string>
+	<cstdlib>
+	"screens.h"
+
+1344440604 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\playermaps.h
+
+1344440700 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\playermaps.cpp
+	<string>
+	"PlayerMaps.h"
+
+1355602252 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\puzzles.cpp
+	<string>
+	<iostream>
+	<cstdlib>
+	"screens.h"
+
+1355603014 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\puzzles.h
+
+1355602781 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\worldinteraction.cpp
+	<iostream>
+	<cstdlib>
+	"Input.h"
+	"dice.h"
+	"screens.h"
+	"Info.h"
+
+1354038648 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\worldinteraction.h
+
+1355602770 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\traps.cpp
+	"dice.h"
+
+1353430653 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\traps.h
+
+1355602722 source:c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\investigations.cpp
+	<iostream>
+	<cstdlib>
+	<cstdio>
+	"Input.h"
+	"dice.h"
+
+1353354719 c:\users\joshua\documents\c++\textquest ii\v2_0_0\textquestiiv2_0_0\investigations.h
+

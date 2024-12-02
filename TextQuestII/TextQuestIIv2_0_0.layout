@@ -1,0 +1,97 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes" ?>
+<CodeBlocks_layout_file>
+	<ActiveTarget name="Debug" />
+	<File name="AI.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="10288" topLine="552" />
+	</File>
+	<File name="AI.h" open="1" top="0" tabpos="3">
+		<Cursor position="202" topLine="0" />
+	</File>
+	<File name="BattleCommands.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="5671" topLine="255" />
+	</File>
+	<File name="BattleCommands.h" open="0" top="0" tabpos="12">
+		<Cursor position="563" topLine="0" />
+	</File>
+	<File name="Info.cpp" open="1" top="0" tabpos="13">
+		<Cursor position="70489" topLine="1316" />
+	</File>
+	<File name="Info.h" open="0" top="0" tabpos="11">
+		<Cursor position="255" topLine="0" />
+	</File>
+	<File name="Input.cpp" open="0" top="0" tabpos="7">
+		<Cursor position="33469" topLine="1303" />
+	</File>
+	<File name="Input.h" open="0" top="0" tabpos="15">
+		<Cursor position="524" topLine="0" />
+	</File>
+	<File name="Investigations.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="3849" topLine="142" />
+	</File>
+	<File name="Investigations.h" open="1" top="0" tabpos="12">
+		<Cursor position="243" topLine="0" />
+	</File>
+	<File name="LoadGame.cpp" open="0" top="0" tabpos="5">
+		<Cursor position="16554" topLine="504" />
+	</File>
+	<File name="LoadGame.h" open="1" top="0" tabpos="2">
+		<Cursor position="1205" topLine="0" />
+	</File>
+	<File name="Puzzles.cpp" open="0" top="0" tabpos="9">
+		<Cursor position="21821" topLine="566" />
+	</File>
+	<File name="Puzzles.h" open="1" top="0" tabpos="4">
+		<Cursor position="280" topLine="0" />
+	</File>
+	<File name="RaceApplication.cpp" open="0" top="0" tabpos="10">
+		<Cursor position="2186" topLine="38" />
+	</File>
+	<File name="RaceApplication.h" open="1" top="0" tabpos="5">
+		<Cursor position="140" topLine="0" />
+	</File>
+	<File name="SaveGame.cpp" open="0" top="0" tabpos="4">
+		<Cursor position="16339" topLine="463" />
+	</File>
+	<File name="SaveGame.h" open="1" top="0" tabpos="6">
+		<Cursor position="1568" topLine="0" />
+	</File>
+	<File name="Traps.cpp" open="0" top="0" tabpos="16">
+		<Cursor position="2395" topLine="138" />
+	</File>
+	<File name="Traps.h" open="1" top="0" tabpos="7">
+		<Cursor position="129" topLine="0" />
+	</File>
+	<File name="WorldInteraction.cpp" open="0" top="0" tabpos="12">
+		<Cursor position="23553" topLine="764" />
+	</File>
+	<File name="WorldInteraction.h" open="1" top="0" tabpos="8">
+		<Cursor position="157" topLine="0" />
+	</File>
+	<File name="dice.cpp" open="1" top="1" tabpos="15">
+		<Cursor position="267" topLine="76" />
+	</File>
+	<File name="dice.h" open="1" top="0" tabpos="9">
+		<Cursor position="106" topLine="0" />
+	</File>
+	<File name="fight.cpp" open="0" top="0" tabpos="2">
+		<Cursor position="24577" topLine="807" />
+	</File>
+	<File name="fight.h" open="1" top="0" tabpos="1">
+		<Cursor position="52" topLine="0" />
+	</File>
+	<File name="main.cpp" open="1" top="0" tabpos="14">
+		<Cursor position="98" topLine="16337" />
+	</File>
+	<File name="maps.cpp" open="0" top="0" tabpos="8">
+		<Cursor position="106232" topLine="2920" />
+	</File>
+	<File name="maps.h" open="1" top="0" tabpos="10">
+		<Cursor position="255" topLine="0" />
+	</File>
+	<File name="screens.cpp" open="0" top="0" tabpos="13">
+		<Cursor position="8851" topLine="236" />
+	</File>
+	<File name="screens.h" open="1" top="0" tabpos="11">
+		<Cursor position="67" topLine="0" />
+	</File>
+</CodeBlocks_layout_file>

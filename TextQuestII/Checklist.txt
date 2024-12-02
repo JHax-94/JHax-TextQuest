@@ -1,0 +1,44 @@
+Change tutorial. - ranger speach, adjust string replace so name doesn't overwrite
+					text. /
+
+Sneak on Troll, can't go back, can't charge.  -
+
+Cast spell, 'enemy casts a spell'  / Doesn't pause. - 
+
+You cannot go south at end of 0 floor /
+
+Set defences /
+
+Living quarters skeleton text doesn't refresh after battle /
+
+crashes after Elven Aura cast, name iteration. /
+Elven Aura cast, allows multiple casts, statement not working. - 
+No pause when ancient power cast
+
+Throne Room door says skeletons dead if shiny key picked up / 
+
+battle crash when 2 characters dead, skeleton AI? /
+
+Improve magic if staff in inventory.
+
+Add 'back' to choose weapon
+
+add 'goblin drops arrows'
+
+add 'try again' to spoon puzzle
+
+Skeletons target dead players
+
+Magic too powerful
+
+start with some potions
+
+Start with more arrows, put more arrows in map?
+
+USEPOTION IN ROOMS ABOVE 72
+
+REMOVE STATS BEFORE RELEASE!
+
+BALANCING
+
+Reduce Orc strength
